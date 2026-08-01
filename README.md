@@ -31,6 +31,16 @@ Quitarlas a mano implica saber el nombre exacto del paquete (que no siempre coin
 
 No es un "optimizador" ni promete liberar gigas milagrosos. 
 
+
+<img width="740" height="436" alt="1 pantalla-inicio-terminal" src="https://github.com/user-attachments/assets/981f1d8a-78da-479f-a09d-11b389ae0466" />
+<img width="738" height="438" alt="2 inicio-mintappremover" src="https://github.com/user-attachments/assets/cffa6472-20d1-45a6-a67f-850565e43d6c" />
+<img width="742" height="435" alt="3 detecta-apps-mint" src="https://github.com/user-attachments/assets/7e9ef22b-591c-4e92-876d-bf9678b89d5f" />
+<img width="742" height="437" alt="4 desinstalar-mint" src="https://github.com/user-attachments/assets/f7a029f9-c310-492a-870e-fb612ccf8a10" />
+<img width="751" height="437" alt="5 desinstalar-modoavanzado" src="https://github.com/user-attachments/assets/2620c815-2577-46bf-aaeb-f11e4c6e278f" />
+<img width="746" height="411" alt="6 desinstalar-modoavanzado2" src="https://github.com/user-attachments/assets/1f290a51-a6ac-4041-a8b4-e7dd69069adb" />
+<img width="743" height="431" alt="7 limpiar-dependencias" src="https://github.com/user-attachments/assets/691b66cb-e7a9-4466-95d4-b4886405aa60" />
+
+
 ## Ventaja
 
 La mayoría de los scripts de este estilo que circulan por foros son una lista fija de `sudo apt purge paquete1 paquete2 paquete3...`. Si algún nombre de paquete cambió entre versiones de Mint, o si tienes algo instalado que el autor del script no consideró, te quedas a medias o —peor— confías ciegamente en una lista que no revisaste.
