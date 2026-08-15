@@ -61,7 +61,7 @@ Hay disponibles dos iconos en la carpeta assets para personalizarlo e integrarlo
 **Clonar el repositorio o descargar zip repositorio:**
 
 ```bash
-git clone https://github.com/filonux/mintapp_remover.git
+git clone https://github.com/filonux/MintApp_Remover.git
 cd mintapp_remover
 chmod +x script/MintApp_Remover.sh
 ./script/MintApp_Remover.sh
