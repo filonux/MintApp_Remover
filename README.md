@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon1.png" width="128" alt="Icono de MintApp Remover">
+  <img src="assets/icon1.png" width="140" alt="Icono de MintApp Remover">
 </p>
 
 <h1 align="center">MintApp Remover</h1>
