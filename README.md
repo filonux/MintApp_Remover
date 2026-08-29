@@ -147,4 +147,4 @@ Las contribuciones son bienvenidas. Antes de abrir un *issue* o un *pull request
 
 MintApp Remover es software libre distribuido bajo los términos de la **GNU General Public License versión 3 (GPLv3)**. Consulta el archivo [`LICENSE`](LICENSE) para el texto completo.
 
-Copyright (C) 2026 Filonux
+Hecho por **[Filonux](https://github.com/filonux)**.
