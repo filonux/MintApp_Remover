@@ -116,9 +116,11 @@ jobs:
   # code, so this is the one check that runs it on that bash (the one of Ubuntu
   # 16.04). It is started with "docker run" and not with "container:" because
   # the JavaScript actions (checkout) need a glibc newer than the 2.23 of 16.04.
-  # Python 3.5 has no f-strings: only the bash suites run here (i18n runs above).
-  # continue-on-error: this job has not been seen running on GitHub yet (the
-  # suites do pass on a real bash 4.3.48); remove the line after its first green run.
+  # The suites run as an unprivileged user: as root the harness drops privileges
+  # with setpriv, which 16.04 does not have. python3 is there for the cases that
+  # need it (install, stores); its 3.5 has no f-strings, so i18n runs above only.
+  # continue-on-error: this job has not been seen green on GitHub yet; remove the
+  # line after its first green run.
   bash-4-3:
     name: Suites on bash 4.3 (ubuntu:16.04)
     runs-on: ubuntu-24.04
@@ -133,7 +135,8 @@ jobs:
           docker run --rm --volume "$PWD:/work:ro" --workdir /work --env CI= ubuntu:16.04 bash -c '
             set -e
             apt-get update -qq
-            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends procps
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends procps python3
+            useradd --create-home tester
             bash --version | head -n 1
-            bash tests/run_all.sh language catalog config install meta pm stores functions search clean
+            runuser -u tester -- bash tests/run_all.sh language catalog config install meta pm stores functions search clean
           '
