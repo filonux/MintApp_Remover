@@ -1,10 +1,17 @@
-## Descripción
-Breve descripción de los cambios que realizas con este Pull Request.
+## Description
+Brief description of the changes you are making with this pull request.
 
-## Tipo de cambio
-- [ ] Corrección de error (bug fix)
-- [ ] Nueva característica (new feature)
-- [ ] Cambio que rompe la compatibilidad (breaking change)
+## Type of change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation or tests only
 
-## ¿Cómo se ha probado?
-Describe los pasos que has seguido para probar estos cambios.
+## How was it tested?
+Describe the steps you followed to test these changes.
+
+## Checklist
+- [ ] `bash tests/run_all.sh` and `bash tests/lint.sh` pass
+- [ ] I added or adjusted the tests that cover the change
+- [ ] New or changed texts are in both languages (`MSG_ES` and `MSG_EN`)
+- [ ] If it touches icons, `.desktop` files or desktop paths: I say here on which desktop environments I tested it
