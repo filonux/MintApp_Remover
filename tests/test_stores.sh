@@ -1105,7 +1105,8 @@ HUNG_BG="" HUNG_PGID="" HUNG_SAME=no HUNG_LEFT=0
 
 pgid_of() { cut -d' ' -f5 "/proc/$1/stat" 2>/dev/null || true; }
 # group_alive PGID: how many processes of the group are alive (zombies do not count).
-group_alive() { ps -eo pgid=,stat= | awk -v g="$1" '$1 == g && $2 !~ /^Z/ { n++ } END { print n + 0 }'; }
+# One -o per column: the ps of Ubuntu 16.04 (procps 3.3.10) reads "pid=,comm=" as the header of pid.
+group_alive() { ps -e -o pgid= -o stat= | awk -v g="$1" '$1 == g && $2 !~ /^Z/ { n++ } END { print n + 0 }'; }
 
 hung_start() {
     local code="$1" i prog
@@ -1236,7 +1237,7 @@ check_eq 'SIGTERM only to the program: a second later it is still waiting for th
     "$(kill -0 "$HUNG_BG" 2>/dev/null && echo yes || echo no)"
 check_eq 'SIGTERM only to the program: the record is still the one of a run in progress' '# Status: started' \
     "$(grep '^# Status' "$(rec_file)" 2>/dev/null || echo none)"
-STUB_PIDS="$(ps -eo pid=,pgid=,comm= | awk -v g="$HUNG_PGID" '$2 == g && $3 == "sleep" { print $1 }')"
+STUB_PIDS="$(ps -e -o pid= -o pgid= -o comm= | awk -v g="$HUNG_PGID" '$2 == g && $3 == "sleep" { print $1 }')"
 # shellcheck disable=SC2086  # the list of PIDs is split on purpose
 [ -z "$STUB_PIDS" ] || kill -TERM $STUB_PIDS 2>/dev/null || true
 hung_finish
@@ -1253,11 +1254,11 @@ printf '%s\n' '#!/bin/sh' 'PATH=/usr/local/bin:/usr/bin:/bin' 'case " $* " in *"
     "exec \"$SB/bin/zenity.real\" \"\$@\"" > "$SB/bin/zenity"
 chmod 755 "$SB/bin/zenity"; sandbox_chown
 # window_procs: processes of the group that are the progress window of this test.
-window_procs() { ps -eo pgid=,args= | awk -v g="$HUNG_PGID" '$1 == g && /sleep 61$/ { n++ } END { print n + 0 }'; }
+window_procs() { ps -e -o pgid= -o args= | awk -v g="$HUNG_PGID" '$1 == g && /sleep 61$/ { n++ } END { print n + 0 }'; }
 hung_start "$WINDOWS_HUNG" REQ="$ALL3" "${GUI[@]}" TMPDIR="$SB/tmp"
 check_eq 'the progress window is open while the removal runs' '1|1' "$(gui_dirs)|$(window_procs)"
 hung_send TERM pid
-STUB_PIDS="$(ps -eo pid=,pgid=,args= | awk -v g="$HUNG_PGID" '$2 == g && /sleep 60$/ { print $1 }')"
+STUB_PIDS="$(ps -e -o pid= -o pgid= -o args= | awk -v g="$HUNG_PGID" '$2 == g && /sleep 60$/ { print $1 }')"
 # shellcheck disable=SC2086  # the list of PIDs is split on purpose
 [ -z "$STUB_PIDS" ] || kill -TERM $STUB_PIDS 2>/dev/null || true
 hung_finish

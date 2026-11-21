@@ -457,10 +457,12 @@ embedded_png "$SB/embedded.png"
 check_eq 'the installed icon is the one inside the program, whole' yes "$(cmp -s "$SB/embedded.png" "$installed_icon" && echo yes || echo no)"
 check_eq 'it is filed under 512x512, the largest size hicolor has' yes "$(exists "$SB/home/$ICON512_REL")"
 repo_icon="$H_REPO_DIR/assets/$ICON_NAME"
-if [ -r "$repo_icon" ]; then
-    check_eq 'the icon inside the program is the same image as the one in assets/, pixel for pixel' yes "$(png_same_image "$SB/embedded.png" "$repo_icon")"
-else
+if [ ! -r "$repo_icon" ]; then
     skip_case "the repository has no assets/$ICON_NAME beside the program"
+elif ! command -v python3 >/dev/null 2>&1; then
+    skip_case 'the icon inside the program is the same image as the one in assets/ (python3 is not available)'
+else
+    check_eq 'the icon inside the program is the same image as the one in assets/, pixel for pixel' yes "$(png_same_image "$SB/embedded.png" "$repo_icon")"
 fi
 
 # ------------------------------------------------------------- the launcher ----

@@ -270,7 +270,7 @@ echo "-- Entries of the user: where they work (clean_places)"
 rm -rf "$H/.local" "$H/.cache" "$H/.thumbnails" "$H/.var" "$H/snap"; mkdir -p "$H"
 places() {  # places LABEL EXPECTED ID LEVEL [VAR=val ...]: "ROOT|OWN|PRUNE|DEPTH|tests", places joined by ";" (@ = home)
     local label="$1" expected="$2" id="$3" level="$4"; shift 4
-    app_eval "clean_places $id $level; printf '%s\\n' \"\${CLEAN_PLACES[@]}\" | tr '\\037' '|' | sed \"s|\$HOME|@|g\" | paste -sd';'" "$@"
+    app_eval "clean_places $id $level; printf '%s\\n' \${CLEAN_PLACES[@]+\"\${CLEAN_PLACES[@]}\"} | tr '\\037' '|' | sed \"s|\$HOME|@|g\" | paste -sd';'" "$@"
     check_eq "$label" "$expected" "$OUT"
 }
 places 'no folders, no places' '' recent C
@@ -688,7 +688,7 @@ rcit() {  # rcit LABEL EXPECTED MODE [CODE BEFORE]: <<files|bytes|failed|state|n
     value_of "$label" "$expected"
 }
 rcit 'residual configuration, measure: the packages, no size' '2|0|0|ok|' measure
-app_eval 'clean_item measure rc_config C; printf "%s" "$CLEAN_ITEM_WHERE"; echo "plan: $CLEAN_RC_PLAN" | head -c 0'
+app_eval 'clean_item measure rc_config C; printf "%s" "$CLEAN_ITEM_WHERE"'
 assert_contains 'residual configuration, measure: the plan of the manager is what it shows' "$OUT" 'Purg pkg1'
 app_eval 'clean_item measure rc_config C; printf "%s" "$CLEAN_RC_PLAN"'
 assert_contains 'residual configuration, measure: it keeps the plan to check it when it runs' "$OUT" 'Purg pkg2'
@@ -852,7 +852,7 @@ cs() {  # cs LABEL EXPECTED INPUT [VAR=val ...]: clean_choose_scope S; prints <<
     value_of "$label" "$expected"
 }
 pick() {  # pick LABEL EXPECTED LEVEL INPUT: clean_pick on the plain text; prints <<status|ids chosen>>
-    app_eval_in "$4" "clean_pick $3; printf '<<%s|%s>>' \"\$?\" \"\${CLEAN_CHOSEN[*]}\"" MINTAPP_UI=text
+    app_eval_in "$4" "clean_pick $3; printf '<<%s|%s>>' \"\$?\" \"\${CLEAN_CHOSEN[*]-}\"" MINTAPP_UI=text
     value_of "$1" "$2"
 }
 echo "-- the scope menu"
@@ -910,7 +910,7 @@ pick 'categories: a number outside the list marks nothing' '0|apt_cache' S $'2\n
 pick 'categories: with nothing marked it asks again, and then takes what is marked' '0|apt_cache' S $'2\nc\n\n4\nc\n'
 pick 'categories: going back from the list returns to the scope, which can take another way' "0|$S_ALL" S $'2\n0\n1\n'
 pick 'categories: going back with something marked leaves nothing chosen' '1|' S $'2\n1\n0\n0\n'
-app_eval_in $'1\n0\n' 'clean_pick S >/dev/null; clean_pick S; printf "<<%s|%s>>" "$?" "${CLEAN_CHOSEN[*]}"' MINTAPP_UI=text
+app_eval_in $'1\n0\n' 'clean_pick S >/dev/null; clean_pick S; printf "<<%s|%s>>" "$?" "${CLEAN_CHOSEN[*]-}"' MINTAPP_UI=text
 value_of 'a pick that goes back does not keep what the one before chose' '1|'
 new_sandbox
 deep $'s\n2\n0\n0\n0\n'

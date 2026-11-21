@@ -6809,7 +6809,8 @@ is_excluded_package() {
     local pkg="$1"
     local pattern status=0
 
-    for pattern in "${EXCLUDED_PATTERNS[@]}"; do
+    # The guarded expansion: bash 4.3 treats an empty array as unset under set -u.
+    for pattern in "${EXCLUDED_PATTERNS[@]+"${EXCLUDED_PATTERNS[@]}"}"; do
         # shellcheck disable=SC2053
         if [[ "$pkg" == $pattern ]]; then
             return 0
@@ -6828,7 +6829,7 @@ is_catalog_package() {
     local pkg="$1"
     local entry pkgs p
 
-    for entry in "${CATALOG[@]}"; do
+    for entry in "${CATALOG[@]+"${CATALOG[@]}"}"; do
         IFS='|' read -r _ pkgs _ <<< "$entry"
         for p in ${pkgs//,/ }; do
             if [ "$p" = "$pkg" ]; then

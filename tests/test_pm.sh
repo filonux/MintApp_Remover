@@ -3131,7 +3131,7 @@ check_eq 'zypper_unneeded: if zypper fails the list is empty and the status 1' $
 # The consumers of the plan read it as they read the one of apt.
 zy_reset
 zy_plan 'The following 2 packages are going to be REMOVED:' 'zbase zdep' '2 packages to remove.' | zy_out
-zy_eval 'pm_simulate purge zbase; plan_has_removals "$PLAN_OUTPUT"; echo "has=$?"; plan_package_names "$PLAN_OUTPUT"; plan_fingerprint "$PLAN_OUTPUT" | head -c 0'
+zy_eval 'pm_simulate purge zbase; plan_has_removals "$PLAN_OUTPUT"; echo "has=$?"; plan_package_names "$PLAN_OUTPUT"; plan_fingerprint "$PLAN_OUTPUT" >/dev/null'
 check_eq 'the consumers of the plan: plan_has_removals and plan_package_names read the rows of zypper' $'has=0\nzbase zdep ' "$OUT"
 zy_eval 'pm_simulate purge zbase; first="$PLAN_OUTPUT"; plan_still_valid "$first" purge zbase; echo "same=$?"; plan_still_valid "Remv other" purge zbase; echo "other=$?"'
 check_eq 'plan_still_valid with zypper: the same plan is valid and another one is not' $'same=0\nother=1' "$OUT"

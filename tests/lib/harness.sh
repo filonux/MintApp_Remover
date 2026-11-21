@@ -114,9 +114,10 @@ sandbox_chown() {
     return 0
 }
 
-# _stub NAME: writes the script on stdin as $SB/bin/NAME, with @STATE@ replaced.
+# _stub NAME: writes the script on stdin as $SB/bin/NAME, with @STATE@ replaced. "unset IFS" follows
+# the shebang: bash 4.3 passes the IFS of "IFS=x read ... < <(stub)" on to the stub, and dash keeps it.
 _stub() {
-    sed "s|@STATE@|$SB/state|g" > "$SB/bin/$1"
+    sed -e "s|@STATE@|$SB/state|g" -e '1{p;s/.*/unset IFS/;}' > "$SB/bin/$1"
     chmod 755 "$SB/bin/$1"
 }
 
