@@ -1,38 +1,44 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+about: Something is not working as it should
+title: "[BUG] "
+labels: bug
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Problem description
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Explain clearly what is happening.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Steps to reproduce
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+1. I opened the script with '...'
+2. I checked/unchecked '...'
+3. I pressed '...'
+4. The error occurred
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Expected behavior
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+What should have happened instead.
 
-**Additional context**
-Add any other context about the problem here.
+## Screenshots
+
+If applicable, add screenshots to help explain the problem.
+
+## Environment
+
+- MintApp Remover version: (`MintApp_Remover.sh --version`, or `mintapp-remover --version` if installed)
+- Distro and version: (e.g. Linux Mint 22.3 Cinnamon)
+- Package manager: apt / dnf / pacman / zypper
+- Interface: windows (zenity), terminal menu or plain text (and `MINTAPP_UI`, if you set it)
+- Session: X11 / Wayland
+- `zenity` version: (`zenity --version`)
+- Bash version: (`bash --version`)
+
+```
+(paste the output here)
+```
+
+## Additional context
+
+Any other detail
