@@ -1,7 +1,16 @@
-# Política de seguridad
+# Security Policy
 
-MintApp Remover es un script de uso local: si encuentras un problema real o fallo de seguridad, repórtalo en privado en vez de abrir un issue público.
+MintApp Remover is a script for local use: if you find a real problem or security flaw, report it privately instead of opening a public issue.
 
-## Cómo reportarlo
+## How to report it
 
-Escribe a **Filonux** con una descripción del problema y, si puedes, los pasos para reproducirlo.
+Write to **filonux@proton.me** with a description of the problem and, if you can, the steps to reproduce it. Add your distribution and the output of `MintApp_Remover.sh --version`.
+
+## What counts
+
+The script runs package-manager commands, and removes files in some entries of the deep cleanup, with administrator rights. These are security problems:
+
+- Anything that makes it remove or run something other than what it showed you on screen.
+- Anything that exposes the administrator password you type in its password window.
+
+A wrong text or a window that does not fit is not one: open a normal issue for those.
