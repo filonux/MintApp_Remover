@@ -1,0 +1,139 @@
+name: Quality
+
+# Checks the program: the script, its tests, the workflow itself and the icon
+# that the script embeds (the tests compare the two). Documents (READMEs,
+# licence, templates, screenshots) are not part of that, so a change that
+# touches only them neither starts this workflow nor can break it.
+on:
+  push:
+    paths:
+      - script/**
+      - tests/**
+      - assets/icon5.png
+      - .github/workflows/quality.yml
+  pull_request:
+    paths:
+      - script/**
+      - tests/**
+      - assets/icon5.png
+      - .github/workflows/quality.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-shellcheck:
+    runs-on: ubuntu-24.04
+    # The suites alone take about 14.5 minutes on one core (866 s, measured on 2026-11-18)
+    # and the tools are installed first, so 15 minutes leaves no margin.
+    timeout-minutes: 30
+    env:
+      SHELLCHECK_VERSION: 0.11.0
+      SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # "locales" gives localedef its source files: the security suite builds four UTF-8
+      # locales with it (D7) and, with CI set, a locale it cannot build is a failure.
+      - name: Install the tools the suites use
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq whiptail zenity xvfb openbox xdotool xterm desktop-file-utils rpm dnf createrepo-c pacman-package-manager zypper locales
+
+      - name: Install pinned ShellCheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          url="https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${archive}"
+          curl --fail --location --retry 4 --retry-delay 2 --output "$RUNNER_TEMP/$archive" "$url"
+          printf '%s  %s\n' "$SHELLCHECK_SHA256" "$RUNNER_TEMP/$archive" | sha256sum --check --status
+          tar -xJf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP"
+          install -m 0755 "$RUNNER_TEMP/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$RUNNER_TEMP/shellcheck"
+          echo "SHELLCHECK_BIN=$RUNNER_TEMP/shellcheck" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/shellcheck" --version
+
+      - name: Run static analysis
+        run: bash ./tests/lint.sh
+
+      - name: Check Bash syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n script/MintApp_Remover.sh
+          for file in tests/*.sh tests/lib/*.sh; do
+            bash -n "$file"
+          done
+
+      - name: Run test suites
+        run: bash ./tests/run_all.sh
+
+      # Against the empty tree: every line of the files is checked, whatever the history. In a
+      # pull request HEAD is a merge commit, and "git show --check" finds nothing in one.
+      - name: Check whitespace of the program files
+        run: git diff --check "$(git hash-object -t tree /dev/null)" HEAD -- script tests
+
+  # Level 1 of the compatibility matrix (Debian/Ubuntu family): the suites in
+  # simulation (stub apt, dpkg and sudo, which the harness provides) on the
+  # distributions the program says it supports. The cases against the real
+  # rpm, dnf, pacman and zypper need those tools, so they run in the job above:
+  # an empty CI turns them into skips here instead of failures.
+  distros:
+    name: Suites on ${{ matrix.image }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ["debian:12", "debian:13", "ubuntu:22.04", "ubuntu:24.04"]
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install the tools the suites use
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+            ca-certificates git procps python3 whiptail
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Show the system
+        run: |
+          . /etc/os-release
+          echo "$PRETTY_NAME"
+          bash --version | head -n 1
+          python3 --version
+
+      - name: Run the suites in simulation
+        env:
+          CI: ""
+        run: bash ./tests/run_all.sh i18n language catalog config install meta pm stores functions search clean
+
+  # The program declares bash 4.3 as its minimum. The F4.2 tests only read its
+  # code, so this is the one check that runs it on that bash (the one of Ubuntu
+  # 16.04). It is started with "docker run" and not with "container:" because
+  # the JavaScript actions (checkout) need a glibc newer than the 2.23 of 16.04.
+  # Python 3.5 has no f-strings: only the bash suites run here (i18n runs above).
+  # continue-on-error: this job has not been seen running on GitHub yet (the
+  # suites do pass on a real bash 4.3.48); remove the line after its first green run.
+  bash-4-3:
+    name: Suites on bash 4.3 (ubuntu:16.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run the bash suites in Ubuntu 16.04
+        run: |
+          docker run --rm --volume "$PWD:/work:ro" --workdir /work --env CI= ubuntu:16.04 bash -c '
+            set -e
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends procps
+            bash --version | head -n 1
+            bash tests/run_all.sh language catalog config install meta pm stores functions search clean
+          '
